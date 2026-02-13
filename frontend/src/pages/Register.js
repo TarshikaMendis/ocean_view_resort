@@ -72,7 +72,7 @@ function Register() {
         }}
       >
         <h2 style={{ color: "white", fontSize: "28px", marginBottom: "8px" }}>
-          🌅 Join OceanView Resort
+           Join OceanView Resort
         </h2>
 
         <p style={{ color: "#ddd", marginBottom: "30px", fontSize: "15px" }}>

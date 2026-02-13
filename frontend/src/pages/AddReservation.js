@@ -26,7 +26,7 @@ function AddReservation() {
     // Validation: check date format
     if (!checkInDate || !checkOutDate) {
       setIsSuccess(false);
-      setMessage("❌ Please select valid check-in and check-out dates!");
+      setMessage(" Please select valid check-in and check-out dates!");
       return;
     }
 
@@ -55,7 +55,7 @@ function AddReservation() {
 
         setIsSuccess(true);
         setMessage(
-          "✅ Reservation Added Successfully!\n\nReservation Number: " +
+          " Reservation Added Successfully!\n\nReservation Number: " +
             result.reservationNumber +
             "\nTotal Bill: Rs. " +
             result.totalBill
@@ -71,7 +71,7 @@ function AddReservation() {
       } else {
         setIsSuccess(false);
         setMessage(
-          "❌ Failed to add reservation.\n\nStatus Code: " +
+          " Failed to add reservation.\n\nStatus Code: " +
             response.status +
             "\nBackend Message: " +
             text
@@ -79,7 +79,7 @@ function AddReservation() {
       }
     } catch (error) {
       setIsSuccess(false);
-      setMessage("❌ Error connecting to backend! Please ensure backend is running.");
+      setMessage(" Error connecting to backend! Please ensure backend is running.");
     }
   };
 
@@ -100,7 +100,7 @@ function AddReservation() {
             marginBottom: "10px",
           }}
         >
-          🌊 Ocean View Resort
+           Ocean View Resort
         </h1>
 
         <p
@@ -123,7 +123,7 @@ function AddReservation() {
           }}
         >
           <h2 style={{ color: "#2f5d2f", marginBottom: "25px" }}>
-            🏨 Add New Reservation
+             Add New Reservation
           </h2>
 
           <form onSubmit={handleSubmit}>
@@ -214,7 +214,7 @@ function AddReservation() {
                 cursor: "pointer",
               }}
             >
-              ✅ Add Reservation
+               Add Reservation
             </button>
           </form>
 

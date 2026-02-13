@@ -83,7 +83,7 @@ function Login() {
         }}
       >
         <h1 style={{ marginBottom: "5px", fontSize: "28px" }}>
-          🌊 Ocean View Resort
+           Ocean View Resort
         </h1>
 
         <p style={{ marginBottom: "30px", fontSize: "15px", color: "#f1f1f1" }}>

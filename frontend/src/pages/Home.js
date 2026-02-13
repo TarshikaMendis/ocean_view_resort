@@ -31,7 +31,7 @@ function Home() {
           }}
         >
           <h1 style={{ fontSize: "45px", marginBottom: "10px" }}>
-             Welcome to Ocean View Resort
+             Welcome to Ocean View Resort.
           </h1>
 
           <p style={{ fontSize: "20px" }}>
