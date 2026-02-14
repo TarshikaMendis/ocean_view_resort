@@ -5,6 +5,10 @@ import single from "../images/single.jpg";
 import double from "../images/double.jpg";
 import deluxe from "../images/deluxe.jpg";
 
+import pool from "../images/pool.jpg";
+import restaurant from "../images/restaurant.jpg";
+import wifi from "../images/wifi.jpg";
+
 function Home() {
   return (
     <div style={{ fontFamily: "Arial" }}>
@@ -31,7 +35,7 @@ function Home() {
           }}
         >
           <h1 style={{ fontSize: "45px", marginBottom: "10px" }}>
-             Welcome to Ocean View Resort.
+            Welcome to Ocean View Resort.
           </h1>
 
           <p style={{ fontSize: "20px" }}>
@@ -59,7 +63,7 @@ function Home() {
       {/* About Section */}
       <div style={{ padding: "40px", textAlign: "center" }}>
         <h2 style={{ color: "#003366", fontSize: "32px" }}>
-           About Our Resort
+          About Our Resort
         </h2>
 
         <p style={{ fontSize: "18px", maxWidth: "900px", margin: "20px auto" }}>
@@ -80,7 +84,7 @@ function Home() {
             marginBottom: "30px",
           }}
         >
-           Our Room Types
+          Our Room Types
         </h2>
 
         <div
@@ -208,10 +212,12 @@ function Home() {
       </div>
 
       {/* Services Section */}
-      <div style={{ padding: "40px", textAlign: "center" }}>
-        <h2 style={{ color: "#003366", fontSize: "32px" }}>
-           Our Services
-        </h2>
+      <div style={{ padding: "50px 40px", textAlign: "center" }}>
+        <h2 style={{ color: "#003366", fontSize: "32px" }}>Our Services</h2>
+
+        <p style={{ fontSize: "16px", color: "#555", marginTop: "10px" }}>
+          Enjoy premium facilities and services for a perfect holiday experience.
+        </p>
 
         <div
           style={{
@@ -219,48 +225,101 @@ function Home() {
             justifyContent: "center",
             gap: "30px",
             flexWrap: "wrap",
-            marginTop: "30px",
+            marginTop: "40px",
           }}
         >
+          {/* Swimming Pool */}
           <div
             style={{
-              width: "250px",
-              padding: "20px",
-              backgroundColor: "#f2f9ff",
-              borderRadius: "12px",
-              border: "2px solid #003366",
+              width: "280px",
+              backgroundColor: "white",
+              borderRadius: "15px",
+              overflow: "hidden",
+              boxShadow: "0px 6px 15px rgba(0,0,0,0.2)",
+              transition: "0.3s",
+              cursor: "pointer",
             }}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.transform = "scale(1.05)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
           >
-            <h3> Swimming Pool</h3>
-            <p>Enjoy a relaxing swim with beautiful ocean view.</p>
+            <img
+              src={pool}
+              alt="Swimming Pool"
+              style={{ width: "100%", height: "170px", objectFit: "cover" }}
+            />
+            <div style={{ padding: "20px" }}>
+              <h3 style={{ color: "#003366" }}> Swimming Pool</h3>
+              <p style={{ color: "#555" }}>
+                Enjoy a relaxing swim with a beautiful ocean view.
+              </p>
+            </div>
           </div>
 
+          {/* Restaurant */}
           <div
             style={{
-              width: "250px",
-              padding: "20px",
-              backgroundColor: "#f2f9ff",
-              borderRadius: "12px",
-              border: "2px solid #003366",
+              width: "280px",
+              backgroundColor: "white",
+              borderRadius: "15px",
+              overflow: "hidden",
+              boxShadow: "0px 6px 15px rgba(0,0,0,0.2)",
+              transition: "0.3s",
+              cursor: "pointer",
             }}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.transform = "scale(1.05)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
           >
-            <h3> Restaurant</h3>
-            <p>Delicious seafood and Sri Lankan meals available.</p>
+            <img
+              src={restaurant}
+              alt="Restaurant"
+              style={{ width: "100%", height: "170px", objectFit: "cover" }}
+            />
+            <div style={{ padding: "20px" }}>
+              <h3 style={{ color: "#003366" }}> Restaurant</h3>
+              <p style={{ color: "#555" }}>
+                Delicious seafood and Sri Lankan meals served fresh daily.
+              </p>
+            </div>
           </div>
 
+          {/* Free WiFi */}
           <div
             style={{
-              width: "250px",
-              padding: "20px",
-              backgroundColor: "#f2f9ff",
-              borderRadius: "12px",
-              border: "2px solid #003366",
+              width: "280px",
+              backgroundColor: "white",
+              borderRadius: "15px",
+              overflow: "hidden",
+              boxShadow: "0px 6px 15px rgba(0,0,0,0.2)",
+              transition: "0.3s",
+              cursor: "pointer",
             }}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.transform = "scale(1.05)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
           >
-            <h3> Free WiFi</h3>
-            <p>High speed internet access for all guests.</p>
+            <img
+              src={wifi}
+              alt="Free WiFi"
+              style={{ width: "100%", height: "170px", objectFit: "cover" }}
+            />
+            <div style={{ padding: "20px" }}>
+              <h3 style={{ color: "#003366" }}> Free WiFi</h3>
+              <p style={{ color: "#555" }}>
+                High speed internet access available for all guests.
+              </p>
+            </div>
           </div>
-
         </div>
       </div>
 
