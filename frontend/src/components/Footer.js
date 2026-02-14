@@ -1,4 +1,5 @@
 import React from "react";
+import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
 
 function Footer() {
   return (
@@ -14,26 +15,33 @@ function Footer() {
       <h2 style={{ marginBottom: "10px" }}> Ocean View Resort</h2>
 
       <p style={{ margin: "5px 0" }}>
-        Beach Road, Galle, Sri Lanka |  +94 77 123 4567 |  oceanviewresort@gmail.com
+        Beach Road, Galle, Sri Lanka | +94 77 123 4567 | oceanviewresort@gmail.com
       </p>
 
       <p style={{ margin: "10px 0" }}>
         Luxury Rooms • Beach View • Customer Friendly Service
       </p>
 
-      <div style={{ marginTop: "15px" }}>
+      {/* Social Media Icons */}
+      <div
+        style={{
+          marginTop: "15px",
+          display: "flex",
+          justifyContent: "center",
+          gap: "20px",
+        }}
+      >
         <a
           href="https://facebook.com"
           target="_blank"
           rel="noreferrer"
           style={{
             color: "white",
-            margin: "0 10px",
             textDecoration: "none",
-            fontWeight: "bold",
+            fontSize: "20px",
           }}
         >
-          Facebook
+          <FaFacebookF />
         </a>
 
         <a
@@ -42,12 +50,11 @@ function Footer() {
           rel="noreferrer"
           style={{
             color: "white",
-            margin: "0 10px",
             textDecoration: "none",
-            fontWeight: "bold",
+            fontSize: "20px",
           }}
         >
-          Instagram
+          <FaInstagram />
         </a>
 
         <a
@@ -56,12 +63,11 @@ function Footer() {
           rel="noreferrer"
           style={{
             color: "white",
-            margin: "0 10px",
             textDecoration: "none",
-            fontWeight: "bold",
+            fontSize: "20px",
           }}
         >
-          Twitter
+          <FaTwitter />
         </a>
       </div>
 
