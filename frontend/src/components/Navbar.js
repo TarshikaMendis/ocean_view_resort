@@ -120,15 +120,7 @@ function Navbar() {
               Book Room
             </Link>
 
-            <Link
-              to="/bill-report"
-              style={{
-                ...linkStyle,
-                backgroundColor: "#ff8800",
-              }}
-            >
-              Bill Report
-            </Link>
+            
 
             {/* Admin Only Links */}
             {role === "ADMIN" && (

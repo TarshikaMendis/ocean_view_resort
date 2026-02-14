@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function SearchReservation() {
   const [reservationNumber, setReservationNumber] = useState("");
   const [reservation, setReservation] = useState(null);
   const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -26,6 +29,10 @@ function SearchReservation() {
     }
   };
 
+  const handleGetBillReport = () => {
+    navigate("/bill-report", { state: { reservation } });
+  };
+
   return (
     <div
       style={{
@@ -37,7 +44,7 @@ function SearchReservation() {
     >
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
         <h2 style={{ color: "#3b6b35", textAlign: "center", marginBottom: "40px" }}>
-           Search Reservation
+          Search Reservation
         </h2>
 
         {/* Search Form */}
@@ -109,7 +116,9 @@ function SearchReservation() {
               boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
             }}
           >
-            <h3 style={{ color: "#3b6b35", marginBottom: "20px" }}>✅ Reservation Found</h3>
+            <h3 style={{ color: "#3b6b35", marginBottom: "20px" }}>
+              ✅ Reservation Found
+            </h3>
 
             <p><b>Reservation No:</b> {reservation.reservationNumber}</p>
             <p><b>Guest Name:</b> {reservation.guestName}</p>
@@ -118,9 +127,29 @@ function SearchReservation() {
             <p><b>Room Type:</b> {reservation.roomType}</p>
             <p><b>Check-In:</b> {reservation.checkInDate}</p>
             <p><b>Check-Out:</b> {reservation.checkOutDate}</p>
+
             <p style={{ fontSize: "18px", color: "#3b6b35", marginTop: "15px" }}>
               <b>Total Bill:</b> Rs. {reservation.totalBill}
             </p>
+
+            {/* Get Bill Report Button */}
+            <button
+              onClick={handleGetBillReport}
+              style={{
+                width: "100%",
+                padding: "14px",
+                marginTop: "25px",
+                borderRadius: "10px",
+                border: "none",
+                backgroundColor: "#003366",
+                color: "white",
+                fontWeight: "bold",
+                fontSize: "16px",
+                cursor: "pointer",
+              }}
+            >
+               Get Bill Report
+            </button>
           </div>
         )}
       </div>
