@@ -17,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payment")
-@CrossOrigin(origins = "http://localhost:3000") // allow React frontend
+@CrossOrigin(origins = "http://localhost:3000")
 public class PaymentController {
 
     @Autowired
@@ -26,60 +26,80 @@ public class PaymentController {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    //  Replace with your Razorpay Test Keys
     private static final String RAZORPAY_KEY = "YOUR_KEY_ID";
     private static final String RAZORPAY_SECRET = "YOUR_KEY_SECRET";
 
-    // 1️ Create Razorpay order
+    /**
+     * Create Razorpay Order
+     */
     @PostMapping("/create-order")
-    public Map<String, Object> createOrder(@RequestBody Map<String, Object> requestMap) throws RazorpayException {
-        String reservationId = (String) requestMap.get("reservationId");
-        double amountDouble = Double.parseDouble(requestMap.get("amount").toString());
-        int amount = (int) (amountDouble); // Razorpay requires amount in cents/paise
+    public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> requestMap) {
+        try {
+            String reservationId = (String) requestMap.get("reservationId");
+            double amountDouble = Double.parseDouble(requestMap.get("amount").toString());
 
-        RazorpayClient client = new RazorpayClient(RAZORPAY_KEY, RAZORPAY_SECRET);
+            // Convert to integer (LKR does not need cents)
+            int amount = (int) Math.round(amountDouble);
 
-        JSONObject orderRequest = new JSONObject();
-        orderRequest.put("amount", amount);
-        orderRequest.put("currency", "LKR");
-        orderRequest.put("receipt", "resv_" + reservationId);
+            RazorpayClient client = new RazorpayClient(RAZORPAY_KEY, RAZORPAY_SECRET);
 
-        Order order = client.Orders.create(orderRequest);
+            JSONObject orderRequest = new JSONObject();
+            orderRequest.put("amount", amount); // amount in LKR
+            orderRequest.put("currency", "LKR");
+            orderRequest.put("receipt", "resv_" + reservationId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("orderId", order.get("id"));
-        response.put("amount", order.get("amount"));
-        response.put("currency", order.get("currency"));
-        response.put("key", RAZORPAY_KEY);
+            Order order = client.Orders.create(orderRequest);
 
-        return response;
+            Map<String, Object> response = new HashMap<>();
+            response.put("orderId", order.get("id"));
+            response.put("amount", order.get("amount"));
+            response.put("currency", order.get("currency"));
+            response.put("key", RAZORPAY_KEY);
+
+            return ResponseEntity.ok(response);
+
+        } catch (RazorpayException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Razorpay order creation failed: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Server error: " + e.getMessage());
+        }
     }
 
-    // 2️ Confirm payment and store in DB
+    /**
+     * Confirm Payment and Save to Database
+     */
     @PostMapping("/confirm")
     public ResponseEntity<?> confirmPayment(@RequestBody Map<String, Object> requestMap) {
+        try {
+            String reservationId = (String) requestMap.get("reservationId");
+            String paymentId = (String) requestMap.get("paymentId");
+            String orderId = (String) requestMap.get("orderId");
+            String signature = (String) requestMap.get("signature");
 
-        String reservationId = (String) requestMap.get("reservationId");
-        String paymentId = (String) requestMap.get("paymentId");
-        String orderId = (String) requestMap.get("orderId");
-        String signature = (String) requestMap.get("signature");
+            Payment payment = new Payment();
+            payment.setReservationId(reservationId);
+            payment.setPaymentId(paymentId);
+            payment.setOrderId(orderId);
+            payment.setSignature(signature);
+            payment.setStatus("PAID");
 
-        // Save payment info
-        Payment payment = new Payment();
-        payment.setReservationId(reservationId);
-        payment.setPaymentId(paymentId);
-        payment.setOrderId(orderId);
-        payment.setSignature(signature);
-        payment.setStatus("PAID");
-        paymentRepository.save(payment);
+            paymentRepository.save(payment);
 
-        // Update reservation (optional: you can add a new field paymentStatus in Reservation)
-        Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
-        if(reservation != null){
-            // optional: set a paymentStatus field
-            // reservation.setPaymentStatus("PAID");
-            reservationRepository.save(reservation);
+            // Optional: update reservation with paymentStatus
+            Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
+            if (reservation != null) {
+                // reservation.setPaymentStatus("PAID"); // Add this field if you want
+                reservationRepository.save(reservation);
+            }
+
+            return ResponseEntity.ok("Payment confirmed and saved.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Payment confirmation failed: " + e.getMessage());
         }
-
-        return ResponseEntity.ok("Payment confirmed and saved.");
     }
 }
