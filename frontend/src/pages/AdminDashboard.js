@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function AdminDashboard() {
+  const navigate = useNavigate();
+
   // Reservation Data
   const [reservations, setReservations] = useState([]);
   const [message, setMessage] = useState("");
@@ -32,22 +35,22 @@ function AdminDashboard() {
   // Fetch Reservations
   const fetchReservations = async () => {
     try {
-      const response = await axios.get("http://localhost:8081/api/reservations");
+      const response = await axios.get("http://localhost:8081/api/reservations/all"); // Make sure backend returns paymentStatus
       const data = response.data;
       setReservations(data);
       setTotalReservations(data.length);
 
-      let revenue = 0, single = 0, double = 0, deluxe = 0;
+      let revenue = 0, single = 0, doubleCount = 0, deluxe = 0;
       data.forEach((res) => {
         revenue += res.totalBill;
         if (res.roomType === "SINGLE") single++;
-        else if (res.roomType === "DOUBLE") double++;
+        else if (res.roomType === "DOUBLE") doubleCount++;
         else if (res.roomType === "DELUXE") deluxe++;
       });
 
       setTotalRevenue(revenue);
       setSingleCount(single);
-      setDoubleCount(double);
+      setDoubleCount(doubleCount);
       setDeluxeCount(deluxe);
     } catch (error) {
       setMessage("Error fetching reservations!");
@@ -112,42 +115,30 @@ function AdminDashboard() {
 
       {/* Dashboard Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px", marginBottom: "30px" }}>
-        {/* Total Reservations */}
         <div style={{ padding: "25px", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", textAlign: "center" }}>
           <h2 style={{ fontSize: "18px", color: "#555555", marginBottom: "10px" }}>Total Reservations</h2>
           <p style={{ fontSize: "26px", fontWeight: "700", color: "#1a1a2e" }}>{totalReservations}</p>
         </div>
-
-        {/* Total Revenue */}
         <div style={{ padding: "25px", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", textAlign: "center" }}>
           <h2 style={{ fontSize: "18px", color: "#555555", marginBottom: "10px" }}>Total Revenue</h2>
           <p style={{ fontSize: "26px", fontWeight: "700", color: "#1a1a2e" }}>Rs. {totalRevenue}</p>
         </div>
-
-        {/* Room Type Summary */}
         <div style={{ padding: "25px", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
           <h2 style={{ fontSize: "18px", color: "#555555", marginBottom: "10px" }}>Room Type Summary</h2>
           <p>🛏 Single Rooms: <strong>{singleCount}</strong></p>
           <p>🛏 Double Rooms: <strong>{doubleCount}</strong></p>
           <p>🛏 Deluxe Rooms: <strong>{deluxeCount}</strong></p>
         </div>
-
-        {/* Admin Actions */}
         <div style={{ padding: "25px", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", display: "flex", flexDirection: "column", gap: "10px" }}>
           <button
-            onClick={() => (window.location.href = "/view-reservations")}
-            style={{ padding: "12px", backgroundColor: "#1a1a2e", color: "#ffffff", border: "none", borderRadius: "8px", cursor: "pointer", transition: "0.3s", fontWeight: "600" }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#16213e"}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#1a1a2e"}
+            onClick={() => navigate("/view-reservations")}
+            style={{ padding: "12px", backgroundColor: "#1a1a2e", color: "#ffffff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
           >
             View All Reservations
           </button>
-
           <button
-            onClick={() => (window.location.href = "/add-reservation")}
-            style={{ padding: "12px", backgroundColor: "#0fbcf9", color: "#ffffff", border: "none", borderRadius: "8px", cursor: "pointer", transition: "0.3s", fontWeight: "600" }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#0aa1e0"}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#0fbcf9"}
+            onClick={() => navigate("/add-reservation")}
+            style={{ padding: "12px", backgroundColor: "#0fbcf9", color: "#ffffff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
           >
             Add New Reservation
           </button>
@@ -172,7 +163,6 @@ function AdminDashboard() {
             </select>
             <input type="date" value={editReservation.checkInDate} onChange={(e) => setEditReservation({...editReservation, checkInDate: e.target.value})} required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}/>
             <input type="date" value={editReservation.checkOutDate} onChange={(e) => setEditReservation({...editReservation, checkOutDate: e.target.value})} required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}/>
-
             <button type="submit" style={{ padding: "12px", backgroundColor: "#1a1a2e", color: "#fff", borderRadius: "8px", border: "none", cursor: "pointer", fontWeight: "600" }}>Update Reservation</button>
             <button type="button" onClick={() => setEditReservation(null)} style={{ padding: "12px", backgroundColor: "#e74c3c", color: "#fff", borderRadius: "8px", border: "none", cursor: "pointer", fontWeight: "600" }}>Cancel</button>
           </form>
@@ -192,6 +182,7 @@ function AdminDashboard() {
               <th>Check-In</th>
               <th>Check-Out</th>
               <th>Total Bill</th>
+              <th>Payment Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -205,9 +196,34 @@ function AdminDashboard() {
                 <td>{res.checkInDate}</td>
                 <td>{res.checkOutDate}</td>
                 <td>Rs. {res.totalBill}</td>
+                <td>
+                  <span style={{
+                    padding: "4px 8px",
+                    borderRadius: "6px",
+                    color: "#fff",
+                    backgroundColor: res.paymentStatus === "Paid" ? "#27ae60" : "#f39c12",
+                    fontWeight: "600",
+                    fontSize: "12px",
+                  }}>
+                    {res.paymentStatus}
+                  </span>
+                </td>
                 <td style={{ display: "flex", gap: "5px", justifyContent: "center" }}>
                   <button onClick={() => setEditReservation(res)} style={{ backgroundColor: "#f39c12", color: "#fff", borderRadius: "5px", border: "none", padding: "6px 10px", cursor: "pointer" }}>Update</button>
                   <button onClick={() => handleDelete(res)} style={{ backgroundColor: "#e74c3c", color: "#fff", borderRadius: "5px", border: "none", padding: "6px 10px", cursor: "pointer" }}>Delete</button>
+                  <button onClick={() => navigate("/payment", { state: { reservation: res }})}
+                    disabled={res.paymentStatus === "Paid"}
+                    style={{
+                      backgroundColor: res.paymentStatus === "Paid" ? "#95a5a6" : "#1abc9c",
+                      color: "#fff",
+                      borderRadius: "5px",
+                      border: "none",
+                      padding: "6px 10px",
+                      cursor: res.paymentStatus === "Paid" ? "not-allowed" : "pointer"
+                    }}
+                  >
+                    {res.paymentStatus === "Paid" ? "Paid" : "Pay Now"}
+                  </button>
                 </td>
               </tr>
             ))}

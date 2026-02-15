@@ -1,20 +1,26 @@
 package com.oceanview.resort.service;
 
 import com.oceanview.resort.Reservation;
+import com.oceanview.resort.ReservationDTO;
+import com.oceanview.resort.repository.PaymentRepository;
 import com.oceanview.resort.repository.ReservationRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
-    public ReservationService(ReservationRepository reservationRepository) {
+    public ReservationService(ReservationRepository reservationRepository,
+                              PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     // Create Reservation
@@ -39,16 +45,42 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    public List<Reservation> getAllReservations() { return reservationRepository.findAll(); }
+    // Get all reservations (original)
+    public List<Reservation> getAllReservations() {
+        return reservationRepository.findAll();
+    }
 
+    // Get all reservations with payment status
+    public List<ReservationDTO> getAllReservationsWithPaymentStatus() {
+        List<Reservation> reservations = reservationRepository.findAll();
+        List<ReservationDTO> list = new ArrayList<>();
+
+        for (Reservation res : reservations) {
+            ReservationDTO dto = new ReservationDTO();
+            dto.setId(res.getId());
+            dto.setReservationNumber(res.getReservationNumber());
+            dto.setGuestName(res.getGuestName());
+            dto.setTotalBill(res.getTotalBill());
+
+            boolean isPaid = paymentRepository.existsByReservationId(res.getId());
+            dto.setPaymentStatus(isPaid ? "Paid" : "Pending");
+
+            list.add(dto);
+        }
+        return list;
+    }
+
+    // Get reservation by number
     public Reservation getReservationByNumber(String reservationNumber) {
         return reservationRepository.findByReservationNumber(reservationNumber);
     }
 
+    // Delete reservation
     public void deleteReservation(String id) {
         reservationRepository.deleteById(id);
     }
 
+    // Update reservation
     public Reservation updateReservation(String id, Reservation updatedReservation) {
 
         Reservation existing = reservationRepository.findById(id).orElse(null);
