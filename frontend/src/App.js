@@ -17,6 +17,8 @@ import SearchReservation from "./pages/SearchReservation";
 import AboutContact from "./pages/AboutContact";
 import BillReport from "./pages/BillReport";
 
+//  Payment Form from components folder
+import PaymentForm from "./components/PaymentForm";
 
 function App() {
   return (
@@ -28,12 +30,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/help" element={<Help />} />
         <Route path="/gallery" element={<Gallery />} />
-
         <Route path="/search-reservation" element={<SearchReservation />} />
         <Route path="/about-contact" element={<AboutContact />} />
 
+        {/* Bill + Payment Pages */}
         <Route path="/bill-report" element={<BillReport />} />
-
+        <Route path="/payment" element={<PaymentForm />} />
 
         {/* Auth Pages */}
         <Route path="/login" element={<Login />} />

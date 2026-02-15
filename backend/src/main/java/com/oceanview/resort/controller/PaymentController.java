@@ -1,14 +1,7 @@
 package com.oceanview.resort.controller;
 
 import com.oceanview.resort.Payment;
-import com.oceanview.resort.Reservation;
-import com.oceanview.resort.repository.PaymentRepository;
-import com.oceanview.resort.repository.ReservationRepository;
-import com.razorpay.Order;
-import com.razorpay.RazorpayClient;
-import com.razorpay.RazorpayException;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.oceanview.resort.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,86 +13,52 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:3000")
 public class PaymentController {
 
-    @Autowired
-    private PaymentRepository paymentRepository;
+    private final PaymentService paymentService;
 
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    //  Replace with your Razorpay Test Keys
-    private static final String RAZORPAY_KEY = "YOUR_KEY_ID";
-    private static final String RAZORPAY_SECRET = "YOUR_KEY_SECRET";
-
-    /**
-     * Create Razorpay Order
-     */
-    @PostMapping("/create-order")
-    public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> requestMap) {
-        try {
-            String reservationId = (String) requestMap.get("reservationId");
-            double amountDouble = Double.parseDouble(requestMap.get("amount").toString());
-
-            // Convert to integer (LKR does not need cents)
-            int amount = (int) Math.round(amountDouble);
-
-            RazorpayClient client = new RazorpayClient(RAZORPAY_KEY, RAZORPAY_SECRET);
-
-            JSONObject orderRequest = new JSONObject();
-            orderRequest.put("amount", amount); // amount in LKR
-            orderRequest.put("currency", "LKR");
-            orderRequest.put("receipt", "resv_" + reservationId);
-
-            Order order = client.Orders.create(orderRequest);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("orderId", order.get("id"));
-            response.put("amount", order.get("amount"));
-            response.put("currency", order.get("currency"));
-            response.put("key", RAZORPAY_KEY);
-
-            return ResponseEntity.ok(response);
-
-        } catch (RazorpayException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Razorpay order creation failed: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Server error: " + e.getMessage());
-        }
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
     }
 
-    /**
-     * Confirm Payment and Save to Database
-     */
     @PostMapping("/confirm")
-    public ResponseEntity<?> confirmPayment(@RequestBody Map<String, Object> requestMap) {
+    public ResponseEntity<?> confirmPayment(@RequestBody Map<String, String> request) {
+
         try {
-            String reservationId = (String) requestMap.get("reservationId");
-            String paymentId = (String) requestMap.get("paymentId");
-            String orderId = (String) requestMap.get("orderId");
-            String signature = (String) requestMap.get("signature");
+            String reservationId = request.get("reservationId");
+            String cardName = request.get("cardName");
+            String cardNumber = request.get("cardNumber");
+            String expiryDate = request.get("expiryDate");
+            String cvv = request.get("cvv");
+
+            if (reservationId == null || reservationId.isEmpty())
+                return ResponseEntity.badRequest().body("Reservation ID required!");
+
+            if (cardName == null || cardName.isEmpty())
+                return ResponseEntity.badRequest().body("Card name required!");
+
+            if (cardNumber == null || cardNumber.length() < 12)
+                return ResponseEntity.badRequest().body("Invalid card number!");
+
+            if (expiryDate == null || expiryDate.isEmpty())
+                return ResponseEntity.badRequest().body("Expiry date required!");
+
+            if (cvv == null || cvv.length() < 3)
+                return ResponseEntity.badRequest().body("Invalid CVV!");
 
             Payment payment = new Payment();
             payment.setReservationId(reservationId);
-            payment.setPaymentId(paymentId);
-            payment.setOrderId(orderId);
-            payment.setSignature(signature);
-            payment.setStatus("PAID");
+            payment.setCardName(cardName);
+            payment.setExpiryDate(expiryDate);
 
-            paymentRepository.save(payment);
+            Payment savedPayment = paymentService.makePayment(payment, cardNumber);
 
-            // Optional: update reservation with paymentStatus
-            Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
-            if (reservation != null) {
-                // reservation.setPaymentStatus("PAID"); // Add this field if you want
-                reservationRepository.save(reservation);
-            }
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Payment Successful!");
+            response.put("payment", savedPayment);
 
-            return ResponseEntity.ok("Payment confirmed and saved.");
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Payment confirmation failed: " + e.getMessage());
+            return ResponseEntity.status(500).body("Payment Failed: " + e.getMessage());
         }
     }
 }

@@ -1,0 +1,97 @@
+/* PaymentForm.css */
+
+.payment-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #6dd5ed, #2193b0);
+  font-family: 'Arial', sans-serif;
+  padding: 20px;
+}
+
+.payment-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  padding: 30px 40px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.payment-card:hover {
+  transform: translateY(-5px);
+}
+
+.payment-card h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.payment-card p {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.payment-card label {
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+  margin-top: 15px;
+  font-weight: bold;
+  color: #333;
+}
+
+.payment-card input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  transition: border 0.3s ease;
+}
+
+.payment-card input:focus {
+  border-color: #2193b0;
+  box-shadow: 0 0 5px rgba(33, 147, 176, 0.5);
+}
+
+.btn-confirm {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background-color: #2193b0;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-confirm:hover {
+  background-color: #6dd5ed;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .payment-card {
+    padding: 20px;
+  }
+
+  .payment-card h2 {
+    font-size: 20px;
+  }
+
+  .btn-confirm {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
