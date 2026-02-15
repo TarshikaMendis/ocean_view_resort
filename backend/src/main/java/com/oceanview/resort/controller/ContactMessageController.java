@@ -39,9 +39,16 @@ public class ContactMessageController {
         return ResponseEntity.ok(saved);
     }
 
-    // View All Messages (Optional - for Admin)
+    // View All Messages (Admin)
     @GetMapping("/all")
     public ResponseEntity<List<ContactMessage>> getAllMessages() {
         return ResponseEntity.ok(contactMessageService.getAllMessages());
+    }
+
+    // Delete Message (Admin)
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteMessage(@PathVariable String id) {
+        contactMessageService.deleteMessage(id);
+        return ResponseEntity.ok("Message Deleted Successfully!");
     }
 }

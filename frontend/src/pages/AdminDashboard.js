@@ -6,6 +6,9 @@ function AdminDashboard() {
   const [reservations, setReservations] = useState([]);
   const [message, setMessage] = useState("");
 
+  // Contact Messages
+  const [contactMessages, setContactMessages] = useState([]);
+
   // Dashboard Stats
   const [totalReservations, setTotalReservations] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
@@ -27,7 +30,7 @@ function AdminDashboard() {
     }
   }, []);
 
-  // Fetch Reservations & Stats
+  // Fetch Reservations
   const fetchReservations = async () => {
     try {
       const response = await axios.get("http://localhost:8081/api/reservations");
@@ -58,8 +61,19 @@ function AdminDashboard() {
     }
   };
 
+  // Fetch Contact Messages
+  const fetchMessages = async () => {
+    try {
+      const response = await axios.get("http://localhost:8081/api/messages/all");
+      setContactMessages(response.data);
+    } catch (error) {
+      setMessage("Error fetching contact messages!");
+    }
+  };
+
   useEffect(() => {
     fetchReservations();
+    fetchMessages();
   }, []);
 
   // Delete Reservation
@@ -67,34 +81,47 @@ function AdminDashboard() {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete reservation " + reservation.reservationNumber + "?"
     );
+
     if (!confirmDelete) return;
 
     try {
-      // Use ID here (adjust if backend uses reservationNumber instead)
       await axios.delete(`http://localhost:8081/api/reservations/${reservation.id}`);
-
       setMessage("Reservation Deleted Successfully!");
       fetchReservations();
     } catch (error) {
-      console.error("Delete Error:", error.response || error);
-      setMessage("Delete Failed! Check console for details.");
+      setMessage("Delete Failed!");
     }
   };
 
   // Update Reservation
   const handleUpdate = async (e) => {
     e.preventDefault();
+
     try {
       await axios.put(
         `http://localhost:8081/api/reservations/${editReservation.id}`,
         editReservation
       );
+
       setMessage("Reservation Updated Successfully!");
       setEditReservation(null);
       fetchReservations();
     } catch (error) {
-      console.error("Update Error:", error.response || error);
-      setMessage("Update Failed! Check console for details.");
+      setMessage("Update Failed!");
+    }
+  };
+
+  // Delete Contact Message
+  const handleDeleteMessage = async (msg) => {
+    const confirmDelete = window.confirm("Delete this message from " + msg.name + "?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:8081/api/messages/delete/${msg.id}`);
+      setMessage("Message Deleted Successfully!");
+      fetchMessages();
+    } catch (error) {
+      setMessage("Message Delete Failed!");
     }
   };
 
@@ -158,6 +185,7 @@ function AdminDashboard() {
           }}
         >
           <h2>Admin Actions</h2>
+
           <button
             onClick={() => (window.location.href = "/view-reservations")}
             style={{
@@ -173,6 +201,7 @@ function AdminDashboard() {
           >
             View All Reservations
           </button>
+
           <button
             onClick={() => (window.location.href = "/add-reservation")}
             style={{
@@ -375,6 +404,59 @@ function AdminDashboard() {
 
                   <button
                     onClick={() => handleDelete(res)}
+                    style={{
+                      backgroundColor: "red",
+                      color: "white",
+                      border: "none",
+                      padding: "6px 10px",
+                      cursor: "pointer",
+                      borderRadius: "5px",
+                    }}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {/* Contact Messages Table */}
+      <h3 style={{ marginTop: "50px", color: "#003366" }}> Contact Messages</h3>
+
+      {contactMessages.length === 0 ? (
+        <p>No messages found.</p>
+      ) : (
+        <table
+          border="1"
+          cellPadding="10"
+          cellSpacing="0"
+          style={{
+            width: "100%",
+            marginTop: "20px",
+            borderCollapse: "collapse",
+            textAlign: "center",
+          }}
+        >
+          <thead style={{ backgroundColor: "#003366", color: "white" }}>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Message</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {contactMessages.map((msg) => (
+              <tr key={msg.id}>
+                <td>{msg.name}</td>
+                <td>{msg.email}</td>
+                <td>{msg.message}</td>
+                <td>
+                  <button
+                    onClick={() => handleDeleteMessage(msg)}
                     style={{
                       backgroundColor: "red",
                       color: "white",

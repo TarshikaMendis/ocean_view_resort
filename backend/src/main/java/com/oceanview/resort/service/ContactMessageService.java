@@ -15,11 +15,18 @@ public class ContactMessageService {
         this.contactMessageRepository = contactMessageRepository;
     }
 
+    // Save Message
     public ContactMessage saveMessage(ContactMessage contactMessage) {
         return contactMessageRepository.save(contactMessage);
     }
 
+    // Get All Messages
     public List<ContactMessage> getAllMessages() {
         return contactMessageRepository.findAll();
+    }
+
+    // Delete Message
+    public void deleteMessage(String id) {
+        contactMessageRepository.deleteById(id);
     }
 }
