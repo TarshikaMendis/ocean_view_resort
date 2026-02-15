@@ -21,6 +21,9 @@ public class Reservation {
     private LocalDate checkOutDate;
 
     private double totalBill;
+    
+
+
 
     // Getters and Setters
     public String getId() { return id; }

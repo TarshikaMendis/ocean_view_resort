@@ -1,67 +1,84 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import axios from "axios";
+import "./BillReport.css";
 
 function BillReport() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const reservation = location.state?.reservation;
 
-  const handlePrint = () => {
-    window.print();
+  // Print Bill
+  const handlePrint = () => window.print();
+
+  // Online Payment
+  const handlePayment = async () => {
+    if (!reservation) return;
+
+    try {
+      //  Create order on backend
+      const orderResponse = await axios.post("http://localhost:8081/api/payment/create-order", {
+        reservationId: reservation.id,
+        amount: reservation.totalBill, // Razorpay expects smallest unit automatically handled in backend
+      });
+
+      const { orderId, amount, currency, key } = orderResponse.data;
+
+      //  Razorpay payment
+      const options = {
+        key,
+        amount,
+        currency,
+        name: "Ocean View Resort",
+        description: `Payment for reservation ${reservation.reservationNumber}`,
+        order_id: orderId,
+        handler: async function (response) {
+          //  Confirm payment on backend
+          await axios.post("http://localhost:8081/api/payment/confirm", {
+            reservationId: reservation.id,
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            signature: response.razorpay_signature,
+          });
+
+          //  Success alert
+          Swal.fire({
+            icon: "success",
+            title: "Payment Successful!",
+            text: `Rs. ${reservation.totalBill} paid successfully.`,
+          });
+        },
+        theme: { color: "#003366" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Payment Failed",
+        text: error.response?.data?.message || "Something went wrong!",
+      });
+    }
   };
 
-  // If user comes directly without searching
+  // If no reservation
   if (!reservation) {
     return (
-      <div style={{ padding: "50px", textAlign: "center", fontFamily: "Arial" }}>
-        <h2 style={{ color: "red" }}>No Reservation Data Found!</h2>
+      <div className="no-data">
+        <h2>No Reservation Data Found!</h2>
         <p>Please search reservation first.</p>
-
-        <button
-          onClick={() => navigate("/search-reservation")}
-          style={{
-            marginTop: "20px",
-            padding: "12px 20px",
-            backgroundColor: "#003366",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-          }}
-        >
-          Go Back to Search
-        </button>
+        <button onClick={() => navigate("/search-reservation")}>Go Back to Search</button>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        padding: "40px",
-        fontFamily: "Arial",
-        backgroundColor: "#f2f7ff",
-        minHeight: "100vh",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "700px",
-          margin: "30px auto",
-          padding: "30px",
-          backgroundColor: "white",
-          borderRadius: "12px",
-          border: "2px solid #003366",
-          boxShadow: "0px 0px 12px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h2 style={{ textAlign: "center", color: "#003366" }}>
-          Ocean View Resort - Bill Receipt
-        </h2>
-
-        <hr style={{ margin: "20px 0" }} />
-
+    <div className="bill-container">
+      <div className="bill-card">
+        <h2>Ocean View Resort - Bill Receipt</h2>
+        <hr />
         <p><b>Reservation Number:</b> {reservation.reservationNumber}</p>
         <p><b>Guest Name:</b> {reservation.guestName}</p>
         <p><b>Address:</b> {reservation.address}</p>
@@ -69,34 +86,12 @@ function BillReport() {
         <p><b>Room Type:</b> {reservation.roomType}</p>
         <p><b>Check-In Date:</b> {reservation.checkInDate}</p>
         <p><b>Check-Out Date:</b> {reservation.checkOutDate}</p>
+        <hr />
+        <h2 style={{ textAlign: "center", color: "green" }}>Total Bill: Rs. {reservation.totalBill}</h2>
+        <p style={{ textAlign: "center", marginTop: "20px" }}>Thank you for choosing Ocean View Resort</p>
 
-        <hr style={{ margin: "20px 0" }} />
-
-        <h2 style={{ textAlign: "center", color: "green" }}>
-          Total Bill: Rs. {reservation.totalBill}
-        </h2>
-
-        <p style={{ textAlign: "center", marginTop: "20px" }}>
-          Thank you for choosing Ocean View Resort 
-        </p>
-
-        {/* Print Button */}
-        <button
-          onClick={handlePrint}
-          style={{
-            width: "100%",
-            padding: "12px",
-            marginTop: "20px",
-            backgroundColor: "green",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-            borderRadius: "6px",
-            fontSize: "16px",
-          }}
-        >
-           Print Bill Report
-        </button>
+        <button className="btn btn-print" onClick={handlePrint}>Print Bill Report</button>
+        <button className="btn btn-pay" onClick={handlePayment}>Pay Bill</button>
       </div>
     </div>
   );
