@@ -23,7 +23,6 @@ function AdminDashboard() {
   useEffect(() => {
     const role = localStorage.getItem("role");
     const isLoggedIn = localStorage.getItem("isLoggedIn");
-
     if (!isLoggedIn || role !== "ADMIN") {
       alert("Access Denied! Admin only.");
       window.location.href = "/login";
@@ -35,18 +34,12 @@ function AdminDashboard() {
     try {
       const response = await axios.get("http://localhost:8081/api/reservations");
       const data = response.data;
-
       setReservations(data);
       setTotalReservations(data.length);
 
-      let revenue = 0,
-        single = 0,
-        double = 0,
-        deluxe = 0;
-
+      let revenue = 0, single = 0, double = 0, deluxe = 0;
       data.forEach((res) => {
         revenue += res.totalBill;
-
         if (res.roomType === "SINGLE") single++;
         else if (res.roomType === "DOUBLE") double++;
         else if (res.roomType === "DELUXE") deluxe++;
@@ -78,12 +71,7 @@ function AdminDashboard() {
 
   // Delete Reservation
   const handleDelete = async (reservation) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete reservation " + reservation.reservationNumber + "?"
-    );
-
-    if (!confirmDelete) return;
-
+    if (!window.confirm(`Are you sure you want to delete reservation ${reservation.reservationNumber}?`)) return;
     try {
       await axios.delete(`http://localhost:8081/api/reservations/${reservation.id}`);
       setMessage("Reservation Deleted Successfully!");
@@ -96,13 +84,8 @@ function AdminDashboard() {
   // Update Reservation
   const handleUpdate = async (e) => {
     e.preventDefault();
-
     try {
-      await axios.put(
-        `http://localhost:8081/api/reservations/${editReservation.id}`,
-        editReservation
-      );
-
+      await axios.put(`http://localhost:8081/api/reservations/${editReservation.id}`, editReservation);
       setMessage("Reservation Updated Successfully!");
       setEditReservation(null);
       fetchReservations();
@@ -113,9 +96,7 @@ function AdminDashboard() {
 
   // Delete Contact Message
   const handleDeleteMessage = async (msg) => {
-    const confirmDelete = window.confirm("Delete this message from " + msg.name + "?");
-    if (!confirmDelete) return;
-
+    if (!window.confirm(`Delete this message from ${msg.name}?`)) return;
     try {
       await axios.delete(`http://localhost:8081/api/messages/delete/${msg.id}`);
       setMessage("Message Deleted Successfully!");
@@ -126,93 +107,47 @@ function AdminDashboard() {
   };
 
   return (
-    <div style={{ padding: "30px", fontFamily: "Arial" }}>
-      <h1 style={{ color: "#003366" }}> Admin Dashboard</h1>
+    <div style={{ padding: "30px", fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", backgroundColor: "#f5f7fa", minHeight: "100vh" }}>
+      <h1 style={{ color: "#1a1a2e", fontWeight: "700", fontSize: "28px", marginBottom: "20px" }}>Admin Dashboard</h1>
 
       {/* Dashboard Stats */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "20px",
-          marginTop: "20px",
-        }}
-      >
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#f0f8ff",
-            borderRadius: "10px",
-            border: "2px solid #003366",
-          }}
-        >
-          <h2>Total Reservations</h2>
-          <p style={{ fontSize: "22px", fontWeight: "bold" }}>{totalReservations}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px", marginBottom: "30px" }}>
+        {/* Total Reservations */}
+        <div style={{ padding: "25px", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", textAlign: "center" }}>
+          <h2 style={{ fontSize: "18px", color: "#555555", marginBottom: "10px" }}>Total Reservations</h2>
+          <p style={{ fontSize: "26px", fontWeight: "700", color: "#1a1a2e" }}>{totalReservations}</p>
         </div>
 
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#fff0f5",
-            borderRadius: "10px",
-            border: "2px solid #003366",
-          }}
-        >
-          <h2>Total Revenue</h2>
-          <p style={{ fontSize: "22px", fontWeight: "bold" }}>Rs. {totalRevenue}</p>
+        {/* Total Revenue */}
+        <div style={{ padding: "25px", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", textAlign: "center" }}>
+          <h2 style={{ fontSize: "18px", color: "#555555", marginBottom: "10px" }}>Total Revenue</h2>
+          <p style={{ fontSize: "26px", fontWeight: "700", color: "#1a1a2e" }}>Rs. {totalRevenue}</p>
         </div>
 
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#f5fffa",
-            borderRadius: "10px",
-            border: "2px solid #003366",
-          }}
-        >
-          <h2>Room Type Summary</h2>
-          <p>🛏 Single Rooms: {singleCount}</p>
-          <p>🛏 Double Rooms: {doubleCount}</p>
-          <p>🛏 Deluxe Rooms: {deluxeCount}</p>
+        {/* Room Type Summary */}
+        <div style={{ padding: "25px", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+          <h2 style={{ fontSize: "18px", color: "#555555", marginBottom: "10px" }}>Room Type Summary</h2>
+          <p>🛏 Single Rooms: <strong>{singleCount}</strong></p>
+          <p>🛏 Double Rooms: <strong>{doubleCount}</strong></p>
+          <p>🛏 Deluxe Rooms: <strong>{deluxeCount}</strong></p>
         </div>
 
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#ffffe0",
-            borderRadius: "10px",
-            border: "2px solid #003366",
-          }}
-        >
-          <h2>Admin Actions</h2>
-
+        {/* Admin Actions */}
+        <div style={{ padding: "25px", backgroundColor: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", display: "flex", flexDirection: "column", gap: "10px" }}>
           <button
             onClick={() => (window.location.href = "/view-reservations")}
-            style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#003366",
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-              borderRadius: "5px",
-              marginBottom: "10px",
-            }}
+            style={{ padding: "12px", backgroundColor: "#1a1a2e", color: "#ffffff", border: "none", borderRadius: "8px", cursor: "pointer", transition: "0.3s", fontWeight: "600" }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#16213e"}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#1a1a2e"}
           >
             View All Reservations
           </button>
 
           <button
             onClick={() => (window.location.href = "/add-reservation")}
-            style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "green",
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-              borderRadius: "5px",
-            }}
+            style={{ padding: "12px", backgroundColor: "#0fbcf9", color: "#ffffff", border: "none", borderRadius: "8px", cursor: "pointer", transition: "0.3s", fontWeight: "600" }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#0aa1e0"}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#0fbcf9"}
           >
             Add New Reservation
           </button>
@@ -220,151 +155,37 @@ function AdminDashboard() {
       </div>
 
       {/* Messages */}
-      {message && (
-        <p style={{ fontWeight: "bold", color: "green", marginTop: "20px" }}>{message}</p>
-      )}
+      {message && <p style={{ fontWeight: "600", color: "#27ae60", marginBottom: "20px" }}>{message}</p>}
 
       {/* Update Form */}
       {editReservation && (
-        <div
-          style={{
-            border: "2px solid #003366",
-            padding: "20px",
-            marginTop: "20px",
-            borderRadius: "10px",
-            backgroundColor: "#f0f8ff",
-            maxWidth: "500px",
-          }}
-        >
-          <h3 style={{ color: "#003366" }}>✏ Update Reservation</h3>
-
-          <form onSubmit={handleUpdate}>
-            <label>Guest Name</label>
-            <input
-              type="text"
-              value={editReservation.guestName}
-              onChange={(e) =>
-                setEditReservation({ ...editReservation, guestName: e.target.value })
-              }
-              required
-              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-            />
-
-            <label>Address</label>
-            <input
-              type="text"
-              value={editReservation.address}
-              onChange={(e) =>
-                setEditReservation({ ...editReservation, address: e.target.value })
-              }
-              required
-              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-            />
-
-            <label>Contact Number</label>
-            <input
-              type="text"
-              value={editReservation.contactNumber}
-              onChange={(e) =>
-                setEditReservation({
-                  ...editReservation,
-                  contactNumber: e.target.value,
-                })
-              }
-              required
-              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-            />
-
-            <label>Room Type</label>
-            <select
-              value={editReservation.roomType}
-              onChange={(e) =>
-                setEditReservation({ ...editReservation, roomType: e.target.value })
-              }
-              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-            >
+        <div style={{ backgroundColor: "#ffffff", padding: "25px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", marginBottom: "30px", maxWidth: "500px" }}>
+          <h3 style={{ color: "#1a1a2e", marginBottom: "15px" }}>✏ Update Reservation</h3>
+          <form onSubmit={handleUpdate} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <input type="text" value={editReservation.guestName} onChange={(e) => setEditReservation({...editReservation, guestName: e.target.value})} required placeholder="Guest Name" style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}/>
+            <input type="text" value={editReservation.address} onChange={(e) => setEditReservation({...editReservation, address: e.target.value})} required placeholder="Address" style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}/>
+            <input type="text" value={editReservation.contactNumber} onChange={(e) => setEditReservation({...editReservation, contactNumber: e.target.value})} required placeholder="Contact Number" style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}/>
+            <select value={editReservation.roomType} onChange={(e) => setEditReservation({...editReservation, roomType: e.target.value})} style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}>
               <option value="SINGLE">Single</option>
               <option value="DOUBLE">Double</option>
               <option value="DELUXE">Deluxe</option>
             </select>
+            <input type="date" value={editReservation.checkInDate} onChange={(e) => setEditReservation({...editReservation, checkInDate: e.target.value})} required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}/>
+            <input type="date" value={editReservation.checkOutDate} onChange={(e) => setEditReservation({...editReservation, checkOutDate: e.target.value})} required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}/>
 
-            <label>Check-in Date</label>
-            <input
-              type="date"
-              value={editReservation.checkInDate}
-              onChange={(e) =>
-                setEditReservation({ ...editReservation, checkInDate: e.target.value })
-              }
-              required
-              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-            />
-
-            <label>Check-out Date</label>
-            <input
-              type="date"
-              value={editReservation.checkOutDate}
-              onChange={(e) =>
-                setEditReservation({ ...editReservation, checkOutDate: e.target.value })
-              }
-              required
-              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-            />
-
-            <button
-              type="submit"
-              style={{
-                width: "100%",
-                padding: "10px",
-                backgroundColor: "#003366",
-                color: "white",
-                border: "none",
-                cursor: "pointer",
-                borderRadius: "5px",
-              }}
-            >
-              Update Reservation
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setEditReservation(null)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                backgroundColor: "red",
-                color: "white",
-                border: "none",
-                cursor: "pointer",
-                borderRadius: "5px",
-                marginTop: "10px",
-              }}
-            >
-              Cancel
-            </button>
+            <button type="submit" style={{ padding: "12px", backgroundColor: "#1a1a2e", color: "#fff", borderRadius: "8px", border: "none", cursor: "pointer", fontWeight: "600" }}>Update Reservation</button>
+            <button type="button" onClick={() => setEditReservation(null)} style={{ padding: "12px", backgroundColor: "#e74c3c", color: "#fff", borderRadius: "8px", border: "none", cursor: "pointer", fontWeight: "600" }}>Cancel</button>
           </form>
         </div>
       )}
 
       {/* Reservation Table */}
-      <h3 style={{ marginTop: "30px" }}> All Reservations</h3>
-
-      {reservations.length === 0 ? (
-        <p>No reservations found.</p>
-      ) : (
-        <table
-          border="1"
-          cellPadding="10"
-          cellSpacing="0"
-          style={{
-            width: "100%",
-            marginTop: "20px",
-            borderCollapse: "collapse",
-            textAlign: "center",
-          }}
-        >
-          <thead style={{ backgroundColor: "#003366", color: "white" }}>
+      <h3 style={{ marginBottom: "15px", color: "#1a1a2e" }}>All Reservations</h3>
+      {reservations.length === 0 ? <p>No reservations found.</p> :
+        <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: "#ffffff", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
+          <thead style={{ backgroundColor: "#1a1a2e", color: "#ffffff" }}>
             <tr>
-              <th>Reservation No</th>
+              <th style={{ padding: "12px" }}>Reservation No</th>
               <th>Guest Name</th>
               <th>Contact</th>
               <th>Room Type</th>
@@ -374,106 +195,52 @@ function AdminDashboard() {
               <th>Actions</th>
             </tr>
           </thead>
-
           <tbody>
-            {reservations.map((res) => (
-              <tr key={res.id}>
-                <td>{res.reservationNumber}</td>
+            {reservations.map((res, i) => (
+              <tr key={res.id} style={{ backgroundColor: i % 2 === 0 ? "#f9f9f9" : "#ffffff" }}>
+                <td style={{ padding: "10px" }}>{res.reservationNumber}</td>
                 <td>{res.guestName}</td>
                 <td>{res.contactNumber}</td>
                 <td>{res.roomType}</td>
                 <td>{res.checkInDate}</td>
                 <td>{res.checkOutDate}</td>
                 <td>Rs. {res.totalBill}</td>
-
-                <td>
-                  <button
-                    onClick={() => setEditReservation(res)}
-                    style={{
-                      backgroundColor: "orange",
-                      color: "white",
-                      border: "none",
-                      padding: "6px 10px",
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                      marginRight: "5px",
-                    }}
-                  >
-                    Update
-                  </button>
-
-                  <button
-                    onClick={() => handleDelete(res)}
-                    style={{
-                      backgroundColor: "red",
-                      color: "white",
-                      border: "none",
-                      padding: "6px 10px",
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    Delete
-                  </button>
+                <td style={{ display: "flex", gap: "5px", justifyContent: "center" }}>
+                  <button onClick={() => setEditReservation(res)} style={{ backgroundColor: "#f39c12", color: "#fff", borderRadius: "5px", border: "none", padding: "6px 10px", cursor: "pointer" }}>Update</button>
+                  <button onClick={() => handleDelete(res)} style={{ backgroundColor: "#e74c3c", color: "#fff", borderRadius: "5px", border: "none", padding: "6px 10px", cursor: "pointer" }}>Delete</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      )}
+      }
 
       {/* Contact Messages Table */}
-      <h3 style={{ marginTop: "50px", color: "#003366" }}> Contact Messages</h3>
-
-      {contactMessages.length === 0 ? (
-        <p>No messages found.</p>
-      ) : (
-        <table
-          border="1"
-          cellPadding="10"
-          cellSpacing="0"
-          style={{
-            width: "100%",
-            marginTop: "20px",
-            borderCollapse: "collapse",
-            textAlign: "center",
-          }}
-        >
-          <thead style={{ backgroundColor: "#003366", color: "white" }}>
+      <h3 style={{ marginTop: "40px", marginBottom: "15px", color: "#1a1a2e" }}>Contact Messages</h3>
+      {contactMessages.length === 0 ? <p>No messages found.</p> :
+        <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: "#ffffff", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
+          <thead style={{ backgroundColor: "#1a1a2e", color: "#fff" }}>
             <tr>
-              <th>Name</th>
+              <th style={{ padding: "12px" }}>Name</th>
               <th>Email</th>
               <th>Message</th>
               <th>Action</th>
             </tr>
           </thead>
-
           <tbody>
-            {contactMessages.map((msg) => (
-              <tr key={msg.id}>
-                <td>{msg.name}</td>
+            {contactMessages.map((msg, i) => (
+              <tr key={msg.id} style={{ backgroundColor: i % 2 === 0 ? "#f9f9f9" : "#ffffff" }}>
+                <td style={{ padding: "10px" }}>{msg.name}</td>
                 <td>{msg.email}</td>
                 <td>{msg.message}</td>
-                <td>
-                  <button
-                    onClick={() => handleDeleteMessage(msg)}
-                    style={{
-                      backgroundColor: "red",
-                      color: "white",
-                      border: "none",
-                      padding: "6px 10px",
-                      cursor: "pointer",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    Delete
-                  </button>
+                <td style={{ textAlign: "center" }}>
+                  <button onClick={() => handleDeleteMessage(msg)} style={{ backgroundColor: "#e74c3c", color: "#fff", borderRadius: "5px", border: "none", padding: "6px 10px", cursor: "pointer" }}>Delete</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      )}
+      }
     </div>
   );
 }
