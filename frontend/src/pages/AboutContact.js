@@ -1,16 +1,30 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 function AboutContact() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Thank you! Your message has been sent successfully.");
-    setName("");
-    setEmail("");
-    setMessage("");
+
+    try {
+      await axios.post("http://localhost:8081/api/messages/send", {
+        name: name,
+        email: email,
+        message: message,
+      });
+
+      setSuccessMsg(" Thank you! Your message has been sent successfully.");
+
+      setName("");
+      setEmail("");
+      setMessage("");
+    } catch (error) {
+      alert(" Message sending failed! Please try again.");
+    }
   };
 
   return (
@@ -37,7 +51,6 @@ function AboutContact() {
             flex: "1 1 200px",
             backgroundImage:
               "url('https://cf.bstatic.com/xdata/images/hotel/max1024x768/84738858.jpg?k=489d49455539b0707f1f06e8e60e8cdb688e171281023c7c57a493cba4eea3cc&o=')",
-
             backgroundSize: "cover",
             backgroundPosition: "center",
             borderRadius: "20px",
@@ -46,11 +59,7 @@ function AboutContact() {
         ></div>
 
         {/* Right Content */}
-        <div
-          style={{
-            flex: "1 1 500px",
-          }}
-        >
+        <div style={{ flex: "1 1 500px" }}>
           {/* About Section */}
           <div
             style={{
@@ -70,7 +79,13 @@ function AboutContact() {
               relaxing experiences for our guests.
             </p>
 
-            <h2 style={{ color: "#3b6b35", marginTop: "25px", marginBottom: "10px" }}>
+            <h2
+              style={{
+                color: "#3b6b35",
+                marginTop: "25px",
+                marginBottom: "10px",
+              }}
+            >
               Our Mission
             </h2>
             <p style={{ fontSize: "16px", lineHeight: "26px" }}>
@@ -79,7 +94,13 @@ function AboutContact() {
               facilities.
             </p>
 
-            <h2 style={{ color: "#3b6b35", marginTop: "25px", marginBottom: "10px" }}>
+            <h2
+              style={{
+                color: "#3b6b35",
+                marginTop: "25px",
+                marginBottom: "10px",
+              }}
+            >
               Our Facilities
             </h2>
             <ul style={{ fontSize: "16px", lineHeight: "26px" }}>
@@ -90,8 +111,14 @@ function AboutContact() {
               <li>24/7 Customer Support</li>
             </ul>
 
-            <h2 style={{ color: "#3b6b35", marginTop: "25px", marginBottom: "10px" }}>
-               Location
+            <h2
+              style={{
+                color: "#3b6b35",
+                marginTop: "25px",
+                marginBottom: "10px",
+              }}
+            >
+              Location
             </h2>
             <p style={{ fontSize: "16px", lineHeight: "26px" }}>
               Ocean View Resort is located near the beach with easy access to
@@ -108,10 +135,27 @@ function AboutContact() {
               boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
             }}
           >
-            <h1 style={{ color: "#3b6b35", marginBottom: "15px" }}>Contact Us</h1>
+            <h1 style={{ color: "#3b6b35", marginBottom: "15px" }}>
+              Contact Us
+            </h1>
+
             <p style={{ fontSize: "16px", lineHeight: "26px" }}>
-              If you have any questions or need help, please contact Ocean View Resort.
+              If you have any questions or need help, please contact Ocean View
+              Resort.
             </p>
+
+            {successMsg && (
+              <p
+                style={{
+                  marginTop: "15px",
+                  fontWeight: "bold",
+                  color: "green",
+                  textAlign: "center",
+                }}
+              >
+                {successMsg}
+              </p>
+            )}
 
             <form onSubmit={handleSubmit} style={{ marginTop: "25px" }}>
               <label style={{ fontWeight: "bold" }}>Name</label>
@@ -128,10 +172,7 @@ function AboutContact() {
                   borderRadius: "10px",
                   border: "1px solid #ccc",
                   outline: "none",
-                  transition: "0.3s",
                 }}
-                onFocus={(e) => (e.target.style.borderColor = "#7cb342")}
-                onBlur={(e) => (e.target.style.borderColor = "#ccc")}
               />
 
               <label style={{ fontWeight: "bold" }}>Email</label>
@@ -148,10 +189,7 @@ function AboutContact() {
                   borderRadius: "10px",
                   border: "1px solid #ccc",
                   outline: "none",
-                  transition: "0.3s",
                 }}
-                onFocus={(e) => (e.target.style.borderColor = "#7cb342")}
-                onBlur={(e) => (e.target.style.borderColor = "#ccc")}
               />
 
               <label style={{ fontWeight: "bold" }}>Message</label>
@@ -168,10 +206,7 @@ function AboutContact() {
                   borderRadius: "10px",
                   border: "1px solid #ccc",
                   outline: "none",
-                  transition: "0.3s",
                 }}
-                onFocus={(e) => (e.target.style.borderColor = "#7cb342")}
-                onBlur={(e) => (e.target.style.borderColor = "#ccc")}
               />
 
               <button
@@ -186,10 +221,7 @@ function AboutContact() {
                   borderRadius: "10px",
                   fontWeight: "bold",
                   fontSize: "16px",
-                  transition: "0.3s",
                 }}
-                onMouseOver={(e) => (e.target.style.background = "#689f38")}
-                onMouseOut={(e) => (e.target.style.background = "#7cb342")}
               >
                 Send Message
               </button>
@@ -199,9 +231,15 @@ function AboutContact() {
               <h3 style={{ color: "#3b6b35", marginBottom: "10px" }}>
                 Resort Contact Details
               </h3>
-              <p><b>Address:</b> Ocean View Resort, Beach Road, Galle, Sri Lanka</p>
-              <p><b>Phone:</b> +94 77 123 4567</p>
-              <p><b>Email:</b> oceanviewresort@gmail.com</p>
+              <p>
+                <b>Address:</b> Ocean View Resort, Beach Road, Galle, Sri Lanka
+              </p>
+              <p>
+                <b>Phone:</b> +94 77 123 4567
+              </p>
+              <p>
+                <b>Email:</b> oceanviewresort@gmail.com
+              </p>
             </div>
           </div>
         </div>
