@@ -72,9 +72,7 @@ function Navbar() {
           Help
         </Link>
 
-        <Link to="/search-reservation" style={linkStyle}>
-          Search
-        </Link>
+        
 
         <Link to="/about-contact" style={linkStyle}>
           About
@@ -120,7 +118,9 @@ function Navbar() {
               Book Room
             </Link>
 
-            
+            <Link to="/search-reservation" style={linkStyle}>
+              Search
+            </Link>
 
             {/* Admin Only Links */}
             {role === "ADMIN" && (
